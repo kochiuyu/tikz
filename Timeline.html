@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<HTML>
+<HEAD>
+<TITLE>Sketch 2D Graph</TITLE>
+<!--tubiao-->
+<link href="css/font-awesome.css" rel='stylesheet' type="text/css">
+<!--tubiao-->
+
+<link href="css/style-1.css" rel="stylesheet" type="text/css" media="all" />
+<link title="no title" href="css/latex.css" rel="stylesheet" type="text/css" media="all" charset="utf-8">
+
+
+<script type="text/javascript" src="js/import.js"></script>
+<script type='text/javascript' src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+
+<script type="text/javascript" src="js/jquery.hoverIntent.min.js"></script>
+<script type="text/javascript" src="js/jquery.hoveraccordion.min.js"></script>
+
+</HEAD>
+<BODY>
+
+
+
+<div class="wrap"><!--1-->
+	<div class="header" id="head">
+		<div class="logo">
+			<a href="" alt=""><image src="image/log1.png"/></a>
+		</div>
+		<div class="nav">
+			<ul>
+				<li><a href="homepage.html"><strong>Homepage</strong></a></i>
+			    <li class="active"><i class="icon.home"><a hred=""><strong>Timeline</strong></a></li></li>
+				<li><a href="Help-Timeline.html"><strong>Help</strong></a>  </li>
+			</ul>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<!--banner-->
+	<img src="image/line.png" alt=""/> 
+	<div class="content"><!--content-->
+	
+	<div class="content-left">
+	<table style="">
+		<tr>
+			<td>start year:</td>
+			<td><input type="text" value="1900" id="beginTime" /></td>
+		</tr>
+		
+		<tr>
+			<td>end year:</td>
+			<td><input type="text" value="2015" id="endTime" /></td>
+		</tr>
+		
+		<tr>
+			<td>scale(px/year):</td>
+			<td><input type="text" value="5" id="scale" /></td>
+		</tr>
+		
+		<tr>
+			<td>font-size:</td>
+			<td>
+				<select id="fontsize">
+					<option value="8px">8px</option>
+					<option value="14px">12px</option>
+					<option value="18px">16px</option>
+					<option value="20px">20px</option>
+				</select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>coordinate type:</td>
+			<td>
+				<select id="coordinate">
+					<option value="x">horizontal coordinate</option>
+					<option value="y">vertical coordinate</option>
+				</select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>line color:</td>
+			<td>
+				<select id="linecolor">
+					<option value = "black" selected>black</option>
+					<option value = "yellow">yellow</option>
+					<option value = "red">red</option>
+					<option value = "blue">blue</option>
+					<option value = "purple">purple</option>
+					<option value = "brown">brown</option>
+					<option value = "orange">orange</option>
+					<option value = "green">green</option>
+				</select>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>point color:</td>
+			<td>
+				<select id="pointcolor">
+					<option value = "black" selected>black</option>
+					<option value = "yellow">yellow</option>
+					<option value = "red">red</option>
+					<option value = "blue">blue</option>
+					<option value = "purple">purple</option>
+					<option value = "brown">brown</option>
+					<option value = "orange">orange</option>
+					<option value = "green">green</option>
+				</select>
+			</td>
+		</tr>
+	</table>
+	</div>
+
+	<div style=" text-align:left; border:1px solid black; margin-top:20px; padding:10px;">
+		event year:<input type="text" id="eyear" />
+		event description:<input type="text" id="edesc" />
+		<input type="button" value="add event" onclick="add()" />
+	</div>
+	
+	
+	<div id="result" style="text-align:left; "></div>
+	<div style="text-align:left;  margin-top:10px"><input type="button" value="Start Draw" onclick="draw()" /></div>
+	
+	<canvas id="myCanvas" width="1200" height="800"></canvas>
+	
+	
+	
+	
+	
+	</div>
+
+<script type="text/javascript">
+
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+var startyear = null;
+var endyear = null;
+var linecolor = null;
+var pointcolor = null;
+var scale = null;
+var fontSize = null;
+var coordinate = null;
+var y_coordinate = 300;
+var answer = null;
+
+function draw () {
+	
+	ctx.clearRect(0,0,1200,800);
+	
+	startyear = document.getElementById('beginTime').value;
+	endyear = document.getElementById('endTime').value;
+	linecolor = document.getElementById('linecolor').value;
+	pointcolor = document.getElementById('pointcolor').value;
+	scale = document.getElementById('scale').value;
+	fontSize = document.getElementById('fontsize').value;
+	coordinate = document.getElementById('coordinate').value;
+	answer =  document.getElementById('answer');
+	
+	if (!/^\d+$/.test(startyear)) {
+		alert('start year must be numeric');
+		return;
+	}
+	
+	if (!/^\d+$/.test(endyear)) {
+		alert('end year must be numeric');
+		return;
+	}
+	
+	if (!/^\d+$/.test(scale)) {
+		alert('scale must be numeric');
+		return;
+	}
+	
+	var linewidth = Math.abs(parseInt(scale*(endyear-startyear)));
+	
+	if (coordinate == 'x') {
+	
+		// line
+		ctx.beginPath();
+		ctx.strokeStyle = linecolor;
+		ctx.moveTo(0, 100);
+		ctx.lineTo(linewidth,100);
+		ctx.stroke();
+		ctx.restore();
+		ctx.save();
+		
+		
+		// triangle
+		ctx.beginPath();
+		ctx.fillStyle = linecolor;
+		ctx.moveTo(linewidth, 100-5);
+		ctx.lineTo(linewidth, 100+5);
+		ctx.lineTo(linewidth+10, 100);
+		ctx.closePath();
+		ctx.fill();
+
+		
+		
+		// begin year
+		ctx.fillStyle = linecolor;
+		ctx.beginPath();
+		ctx.arc(0,100,3,0,Math.PI*2,true);
+		ctx.closePath();
+		ctx.fill();
+		
+		ctx.font=fontSize+" Georgia";
+		ctx.fillText(startyear,0,100+20);
+		
+		
+		// end  year
+		ctx.beginPath();
+		ctx.arc(linewidth,100,3,0,Math.PI*2,true);
+		ctx.closePath();
+		ctx.fill();
+		ctx.fillText(endyear,linewidth,100+20);
+		
+		
+		if(coordinate == 'x'){
+		answer.innerHTML = '';
+		answer.innerHTML += '\\draw [->'+linecolor+'] (0pt,0pt)--('+ linewidth + 'pt,0pt' + ');';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[below] at (0pt,0pt) {'+startyear+'};';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[below] at ('+ linewidth + 'pt,0pt' + ') {'+endyear+'};';
+		answer.innerHTML += '<br>';
+		}
+		if(coordinate == 'y'){
+		answer.innerHTML = '';
+		answer.innerHTML += '\\draw [->'+linecolor+'] (0pt,0pt)--(0pt,-'+ linewidth +'pt);';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[right] at (0pt,0pt) {'+startyear+'};';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[right] at (0pt,-'+ linewidth + 'pt) {'+endyear+'};';
+		answer.innerHTML += '<br>';
+		}
+		
+		
+		var myyears = document.getElementsByClassName('myyear');
+		var mydescs = document.getElementsByClassName('mydesc');
+		
+		for (var i=0; i<myyears.length; i++) {
+			drawPoint(myyears[i].innerHTML,mydescs[i].innerHTML,i);
+		}
+
+	} else {
+	
+		// line
+		ctx.beginPath();
+		ctx.strokeStyle = linecolor;
+		ctx.moveTo(y_coordinate, 100);
+		ctx.lineTo(y_coordinate, 100+linewidth);
+		ctx.stroke();
+		ctx.restore();
+		ctx.save();
+		
+		
+		// triangle
+		ctx.beginPath();
+		ctx.fillStyle = linecolor;
+		ctx.moveTo(y_coordinate-5, 100+linewidth);
+		ctx.lineTo(y_coordinate+5, 100+linewidth);
+		ctx.lineTo(y_coordinate, 100+linewidth+10);
+		ctx.closePath();
+		ctx.fill();
+		
+		
+		
+		// begin year
+		ctx.fillStyle = linecolor;
+		ctx.beginPath();
+		ctx.arc(y_coordinate,100,3,0,Math.PI*2,true);
+		ctx.closePath();
+		ctx.fill();
+		
+		ctx.font=fontSize+" Georgia";
+		ctx.fillText(startyear,y_coordinate+10,100);
+		
+		
+		// end  year
+		ctx.beginPath();
+		ctx.arc(y_coordinate,100+linewidth,3,0,Math.PI*2,true);
+		ctx.closePath();
+		ctx.fill();
+		ctx.fillText(endyear,y_coordinate+10,100+linewidth);
+		
+		
+		if(coordinate == 'x'){
+		answer.innerHTML = '';
+		answer.innerHTML += '\\draw [->'+linecolor+'] (0pt,0pt)--('+ linewidth + 'pt,0pt' + ');';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[below] at (0pt,0pt) {'+startyear+'};';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[below] at ('+ linewidth + 'pt,0pt' + ') {'+endyear+'};';
+		answer.innerHTML += '<br>';
+		}
+		if(coordinate == 'y'){
+		answer.innerHTML = '';
+		answer.innerHTML += '\\draw [->'+linecolor+'] (0pt,0pt)--(0pt,-'+ linewidth +'pt);';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[right] at (0pt,0pt) {'+startyear+'};';
+		answer.innerHTML += '<br>';
+		answer.innerHTML += '\\node[right] at (0pt,-'+ linewidth + 'pt) {'+endyear+'};';
+		answer.innerHTML += '<br>';
+		}
+				
+		var myyears = document.getElementsByClassName('myyear');
+		var mydescs = document.getElementsByClassName('mydesc');
+		
+		for (var i=0; i<myyears.length; i++) {
+			drawPointy(myyears[i].innerHTML,mydescs[i].innerHTML,i);
+		}
+	}
+}
+
+
+function drawPoint(year,description,index) {
+	if (year<startyear || year>endyear) {
+		return;
+	}
+	
+	// draw point
+	var yearPoint = scale*(year-startyear);
+	
+	ctx.fillStyle = pointcolor;
+	ctx.beginPath();
+	ctx.arc(yearPoint,100,3,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fill();
+	ctx.fillText(description,yearPoint,90);
+	ctx.fillText(year,yearPoint,100+20);
+	
+	if(coordinate == 'x'){
+	answer.innerHTML += '\\node[above] at('+ yearPoint + 'pt,0pt) {' + description + '};<br>\\node[below] at('+ yearPoint + 'pt,0pt) {' + year + '};<br>\\fill['+pointcolor+']('+ yearPoint + 'pt,0pt) circle [radius=1pt];';
+	answer.innerHTML += '<br>';
+	
+	
+	
+	}
+	if(coordinate == 'y'){
+	answer.innerHTML += '\\node[left] at(0pt,-'+ yearPoint + 'pt) {' + description + '};<br>\\node[right] at(0pt,-'+ yearPoint + 'pt) {' + year + '};<br>\\fill['+pointcolor+'](0pt,-'+ yearPoint + 'pt) circle [radius=1pt];';
+	answer.innerHTML += '<br>';
+	}
+}
+
+function drawPointy(year,description,index) {
+	if (year<startyear || year>endyear) {
+		return;
+	}
+	
+	// draw point
+	var yearPoint = scale*(year-startyear);
+	
+	ctx.fillStyle = pointcolor;
+	ctx.beginPath();
+	ctx.arc(y_coordinate,100+yearPoint,3,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fill();
+	ctx.textAlign = 'left';
+	ctx.fillText(year,y_coordinate+10,yearPoint+100);
+	ctx.textAlign = 'right';
+	ctx.fillText(description,y_coordinate-10,yearPoint+100);
+	
+	if(coordinate == 'x'){
+	answer.innerHTML += '\\node[above] at('+ yearPoint + ',0) {' + description + '} <br>\\node[below] at('+ yearPoint + ',0) {' + year + '}<br>\\fill('+ yearPoint + ',0) circle [radius=1pt]';
+	answer.innerHTML += '<br>';}
+	if(coordinate == 'y'){
+	answer.innerHTML += '\\node[left] at('+ yearPoint + ',0) {' + description + '} <br>\\node[right] at('+ yearPoint + ',0) {' + year + '}<br>\\fill('+ yearPoint + ',0) circle [radius=1pt]';
+	answer.innerHTML += '<br>';
+	}
+}
+
+function add() {
+
+	var eyear = document.getElementById('eyear').value;
+	var edesc = document.getElementById('edesc').value;
+	if (!/^\d+$/.test(eyear)) {
+		alert('year wrong');
+		return;
+	}
+	eyear = parseInt(eyear);
+	
+	var tempdiv = document.createElement('div');
+	tempdiv.innerHTML = 'event description: <span class="mydesc">'+edesc+'</span>, event year: <span class="myyear">'+eyear+'</span><button onclick="deleteEvent(this)">delete</button>';
+	document.getElementById('result').appendChild(tempdiv);
+}
+
+function deleteEvent(obj) {
+	obj.parentNode.parentNode.removeChild(obj.parentNode);
+}
+
+
+</script>
+
+	</div><!--content-->
+</div><!--1-->
+
+<div id="result-box" style="margin:0 auto; width:85%" >
+</br>
+    <div class="note" style="float:left"><strong></strong></div>
+    <div class="btn with-zero-clipboard" 
+        id="copy-to-clipboard"
+        data-action-id="copy-to-clipboard" style="float:right"><i class="icon-paste1"></i><Strong>Latex Code</Strong></div>
+        </br>
+        </br>
+<pre class="line-numbers language-Tex" title="Double click to select all" style="height:265px;overflow:scroll;"><code class="language-Tex"><span class="token builtin"><span class="token selector">\documentclass</span><span class="token punctuation">{</span><span class="token constant">minimal</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\usepackage</span><span class="token punctuation">{</span><span class="token constant">tikz</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\begin</span><span class="token punctuation">{</span><span class="token constant">document</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\begin</span><span class="token punctuation">{</span><span class="token constant">tikzpicture</span><span class="token punctuation">}</span></span>
+<span id="answer"></span>
+<span class="token builtin"><span class="token selector">\end</span><span class="token punctuation">{</span><span class="token constant">tikzpicture</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\end</span><span class="token punctuation">{</span><span class="token constant">document</span><span class="token punctuation">}</span></span>
+<span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+ </code>
+</pre>
+</div>
+
+
+
+
+
+
+
+
+<!--Footer-->
+<div class="footer-top" id="resume"></div>
+<div class="footer-bottom">
+	<div class="wrap2"></div>
+</div>
+
+</body>
+</html>

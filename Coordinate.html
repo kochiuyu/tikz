@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<HTML>
+<HEAD>
+<TITLE>Sketch 2D Graph</TITLE>
+<!--tubiao-->
+<link href="css/font-awesome.css" rel='stylesheet' type="text/css">
+<!--tubiao-->
+
+<link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+<link title="no title" href="css/latex.css" rel="stylesheet" type="text/css" media="all" charset="utf-8">
+
+<script type="text/javascript" src="js/Examples.js"></script>
+<script type="text/javascript" src="js/input-addline.js"></script>
+<script type="text/javascript" src="js/input-addCurve.js"></script>
+<script type="text/javascript" src="js/input-addRectangle.js"></script>
+<script type="text/javascript" src="js/Draw Tikz Line.js"></script>
+<script type="text/javascript" src="js/input-addPoints.js"></script>
+<script type="text/javascript" src="js/PrintLine.js"></script>
+<script type="text/javascript" src="js/PrintCurve.js"></script>
+<script type="text/javascript" src="js/Rectangle.js"></script>
+<script type="text/javascript" src="js/DrawGrid.js"></script>
+<script type="text/javascript" src="js/ChoosePoints.js"></script>
+<script type="text/javascript" src="js/DrawGraph.js"></script>
+<script type="text/javascript" src="js/individualClear.js"></script>
+<script type="text/javascript" src="js/Export(new).js"></script>
+<script type="text/javascript" src="js/exportCsv.js"></script>
+<script type="text/javascript" src="js/import.js"></script>
+<script type='text/javascript' src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+
+<script type="text/javascript" src="js/jquery.hoverIntent.min.js"></script>
+<script type="text/javascript" src="js/jquery.hoveraccordion.min.js"></script>
+
+<script type="text/javascript" src="js/ca-pub-2865581676256868.js" async></script>
+<script type="text/javascript" src="js/ga.js" async></script>
+
+<script type="text/javascript">
+var counter_i = 5; //counter of number of straight line
+var counter_j = 3; //counter for number of curves
+var counter_z = 2;//counter for number of rectangle
+var scale = 35;  //scale of the preview graph
+var x_offset = scale * 0.8; // offset of canvas (space for label left to the y-axis)
+var y_offset = scale * 0.8; // offset of canvas (space for label below to the x-axis)
+var ps_j=4;
+
+var mouse_history = [];
+var drawingline = true;
+var onlyonepoint = false;
+var nowColor = "#FFFFFF";
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	// Setup HoverAccordion for Example 1
+	$('#example1').hoverAccordion();
+
+	// Setup HoverAccordion for Example 2 with some custom options
+	$('#example2').hoverAccordion({
+		activateitem: '1',
+		speed: 'fast'
+	});
+	$('#example2').children('li:first').addClass('firstitem');
+	$('#example2').children('li:last').addClass('lastitem');
+});
+</script>
+
+
+</HEAD>
+<BODY>
+
+
+
+<div class="wrap"><!--1-->
+	<div class="header" id="head">
+		<div class="logo">
+			<a href="" alt=""><image src="image/log1.png"/></a>
+		</div>
+		<div class="nav">
+			<ul>
+				
+				<li><a href="Homepage.html"><strong>Homepage</strong></a></i> </li>
+				<li class="active"><i class="icon.home"><a href="Coordinate.html"><strong>Coordinate Axis</strong></a></li>
+				<li><a href="Help-Coordinate.html"><strong>Help</strong></a></li>
+				
+			</ul>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<!--banner-->
+	<img src="image/line.png" alt=""/> 
+	<div class="content"><!--content-->
+		<div style="width:52%; float:left;"><strong>Draw Straight Line and Curve</strong></div>
+		<div style="width:41%; float:right;"><span class="content-right2"><strong>Preview</strong>: 
+		Graph Scale
+        <input type="text" id="graph_scale" size="2" value="35" />
+        <div class="btn" style="float:right" onclick="location.reload(true)"><i class="icon-paste5"></i>Clear</div>  
+        <div class="btn" style="float:right" onclick="drawGrid()"><i class="icon-paste3"></i>Grid</div>      
+        <div class="btn" style="float:right" onclick="DrawGraph()"><i class="icon-paste2"></i>Draw</div>
+		
+		</div>
+		
+		<div class="content-left" style="border: 1px solid grey;"><!--content-left-->
+		<a name="ex2" id="ex2"></a>
+		<ul id="example2"><!--outside ul-->
+			<li><a href="#"><i class="icon-paste4"></i>&nbsp;Axis and Lable</a><!-1->
+			<ul>
+				<li>
+				<Form class="inputsize" id="axisform" action="" method="get">
+				<strong>Axis:</strong></br>
+				x:<INPUT TYPE="text" id="xsize" size="5" VALUE="0" style="height:20px; width:25px;">Name<INPUT TYPE="text" id="xname" size="5" VALUE="">y:<INPUT TYPE="text" id="ysize" size="5" VALUE="0" style="height:20px; width:25px;">Name<INPUT TYPE="text" id="yname" size="5" VALUE=""></br>
+				origin: Name<input type="text" id="label_origin_name" size="5" VALUE=""><br>
+				x-axis: Name<input type="text" id="label_x_1_name" size="5" VALUE="">located at <input type="text" id="label_x_1" size="5" VALUE="0"style="height:20px; width:25px;">Name<input type="text" id="label_x_2_name" size="5" VALUE="">located at<input type="text" id="label_x_2" size="5" VALUE="0"style="height:20px; width:25px;"></br>
+				y-axis: Name<input type="text" id="label_y_1_name" size="5" VALUE="">located at <input type="text" id="label_y_1" size="5" VALUE="0"style="height:20px; width:25px;">Name<input type="text" id="label_y_2_name" size="5" VALUE="">located at<input type="text" id="label_y_2" size="5" VALUE="0"style="height:20px; width:25px;"></br>
+				
+				<Strong>Points:</strong></br>
+				Name<input type="text" id="p_name_1" size="5" value="" />located at(<input type="text" id="p_1" size="5" value="0" style="height:20px; width:25px;" />,<input type="text" id="q_1" size="5" value="0" style="height:20px; width:25px;"/>)</br>
+				Name<input type="text" id="p_name_2" size="5" value="" />located at(<input type="text" id="p_2" size="5" value="0" style="height:20px; width:25px;"/>,<input type="text" id="q_2" size="5" value="0" style="height:20px; width:25px;"/>)</br>
+				Name<input type="text" id="p_name_3" size="5" value="" />located at(<input type="text" id="p_3" size="5" value="0" style="height:20px; width:25px;"/>,<input type="text" id="q_3" size="5" value="0" style="height:20px; width:25px;"/>)</br>
+				<input type="button" value="Add Point" onclick="AddPoints(this.form)" />
+                <br>
+
+				</form>
+				</li>
+			</ul>
+			</li><!-1->
+			
+			
+			<li><a href="#">"<i class="icon-paste5"></i>"&nbsp;Rectangle</a><!-2->
+			<ul>
+				<li>
+			<!--------Rectangle---------->
+			<FORM id="Retangularform" NAME="myform3" ACTION="" METHOD="GET"></br>
+			<input TYPE="button" Value="Add More Rectangle" onClick="AddRec(this.form)"></br></br>
+			Rectangle 1: (<input type="text" id="r_1" size="5" VALUE="0"style="height:20px; width:25px;">,<input type="text" id="s_1" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="t_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="u_1" size="5" VALUE="0" style="height:20px; width:25px;">)Show<input type="checkbox" id="retangularshow_1"checked>mouseDraw<input type="checkbox"  name="onlyOne"  id="mouseDR_1" onClick="javascript:test4(0)">allPoints<input type="checkbox"  name="onlyPR" id="retangular_1" onClick="javascript:test5(0)">point1<input   type="checkbox"  name="onlyPR"    id="RP1_1"  onClick="javascript:test5(1)">point2<input   type="checkbox"  name="onlyPR"    id="RP2_1"     onClick="javascript:test5(2)"></br>Dash<input type="checkbox" id="retangulardash_1">Name<input type="text" id="retangularname_1" size="5" VALUE="">
+			Colour:
+			<select id = "retangularColor_1">
+			<option value = "black" selected>black</option>
+			<option value = "yellow">yellow</option>
+			<option value = "red">red</option>
+			<option value = "blue">blue</option>
+			<option value = "purple">purple</option>
+			<option value = "brown">brown</option>
+			<option value = "orange">orange</option>
+			<option value = "green">green</option>
+			</select>
+			<input type="button" id="1" onclick="delR(id)" value="clear"></input>
+			</br></br>
+			</FORM>
+			<!--------Rectangle---------->
+			</li>
+			</ul>
+			</li><!-2->
+			
+			
+			
+			<li><a href="#">"<i class="icon-paste6"></i>"&nbsp;Line</a><!-2->
+			<ul>
+				<li>
+				<FORM id="lineform" NAME="myform" ACTION="" METHOD="GET">
+				</br>
+				<input TYPE="button" Value="Add More Line" onClick="AddLine(this.form)"></br></br>
+				Line 1: (<input type="text" id="a_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="b_1" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="c_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="d_1" size="5" VALUE="0" style="height:20px; width:25px;">)Show<input type="checkbox" id="lineshow_1"checked >mouseDraw<input type="checkbox"	 name="onlyOne"  id="mouseDL_1" onClick="javascript:test(0)">allPoints<input type="checkbox"  name="onlyP"    id="lin_1"     onClick="javascript:test1(0)">point1<input   type="checkbox"  name="onlyP"    id="LP1_1"     onClick="javascript:test1(1)">point2<input   type="checkbox"  name="onlyP"    id="LP2_1"     onClick="javascript:test1(2)"></br>Dash<input type="checkbox" id="linedash_1" >Name<input type="text" id="linename_1" size="5" VALUE="">
+				Colour:
+				<select id = "lineColor_1">
+				<option value = "black" selected>black</option>
+				<option value = "yellow">yellow</option>
+				<option value = "red">red</option>
+				<option value = "blue">blue</option>
+				<option value = "purple">purple</option>
+				<option value = "brown">brown</option>
+				<option value = "orange">orange</option>
+				<option value = "green">green</option>
+				</select>
+				<input type="button" id="1" onclick="del(id)" value="clear"></input>
+				</br>
+				</br>
+				Line 2: (<input type="text" id="a_2" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="b_2" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="c_2" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="d_2" size="5" VALUE="0" style="height:20px; width:25px;">)Show<input type="checkbox" id="lineshow_2">mouseDraw<input type="checkbox"  name="onlyOne"  id="mouseDL_2" onClick="javascript:test(1)">allPoints<input type="checkbox" name="onlyP"    id="lin_2" onClick="javascript:test1(3)">point1<input   type="checkbox"  name="onlyP"    id="LP1_2"     onClick="javascript:test1(4)">point2<input   type="checkbox"  name="onlyP"    id="LP2_2"     onClick="javascript:test1(5)"></br>Dash<input type="checkbox" id="linedash_2">Name<input type="text" id="linename_2" size="5" VALUE="">
+				Colour:
+				<select id = "lineColor_2">
+				<option value = "black" selected>black</option>
+				<option value = "yellow">yellow</option>
+				<option value = "red">red</option>
+				<option value = "blue">blue</option>
+				<option value = "purple">purple</option>
+				<option value = "brown">brown</option>
+				<option value = "orange">orange</option>
+				<option value = "green">green</option>
+				</select>
+				<input type="button" id="2" onclick="del(id)" value="clear"></input>
+				</br>
+				</br>
+				Line 3: (<input type="text" id="a_3" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="b_3" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="c_3" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="d_3" size="5" VALUE="0" style="height:20px; width:25px;">)Show<input type="checkbox" id="lineshow_3">mouseDraw<input type="checkbox"  name="onlyOne"  id="mouseDL_3" onClick="javascript:test(2)">allPoints<input type="checkbox"  name="onlyP"    id="lin_3"     onClick="javascript:test1(6)">point1<input   type="checkbox"  name="onlyP"    id="LP1_3"     onClick="javascript:test1(7)">point2<input  type="checkbox"   name="onlyP"    id="LP2_3"     onClick="javascript:test1(8)"></br>Dash<input type="checkbox" id="linedash_3">Name<input type="text" id="linename_3" size="5" VALUE="">
+				Colour:
+				<select id = "lineColor_3">
+				<option value = "black" selected>black</option>
+				<option value = "yellow">yellow</option>
+				<option value = "red">red</option>
+				<option value = "blue">blue</option>
+				<option value = "purple">purple</option>
+				<option value = "brown">brown</option>
+				<option value = "orange">orange</option>
+				<option value = "green">green</option>
+				</select>
+				<input type="button" id="3" onclick="del(id)" value="clear"></input>
+				</br>
+				</br>
+				Line 4: (<input type="text" id="a_4" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="b_4" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="c_4" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="d_4" size="5" VALUE="0" style="height:20px; width:25px;">)Show<input type="checkbox" id="lineshow_4">mouseDraw<input type="checkbox"  name="onlyOne"  id="mouseDL_4" onClick="javascript:test(3)">allPoints<input type="checkbox"  name="onlyP"    id="lin_4"     onClick="javascript:test1(9)">point1<input   type="checkbox"  name="onlyP"    id="LP1_4"     onClick="javascript:test1(10)">point2<input   type="checkbox"  name="onlyP"    id="LP2_4"     onClick="javascript:test1(11)"></br>Dash<input type="checkbox" id="linedash_4">Name<input type="text" id="linename_4" size="5" VALUE="">
+				Colour:
+				<select id = "lineColor_4">
+				<option value = "black" selected>black</option>
+				<option value = "yellow">yellow</option>
+				<option value = "red">red</option>
+				<option value = "blue">blue</option>
+				<option value = "purple">purple</option>
+				<option value = "brown">brown</option>
+				<option value = "orange">orange</option>
+				<option value = "green">green</option>
+				</select>
+				<input type="button" id="4" onclick="del(id)" value="clear"></input>
+				</br>
+				</br>
+				</FORM>
+				</li>
+			</ul>
+			</li><!-2->
+			
+			<li><a href="#">"<i class="icon-paste7"></i>"&nbsp;Curve</a><!-3->
+			<ul>
+				<li>
+				<FORM id="curveform" NAME="myform2" ACTION="" METHOD="GET">
+				</br>
+				<input TYPE="button" Value="Add More Curve" onClick="AddCurve(this.form)"></br></br>
+				Curve 1: (<input type="text" id="e_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="f_1" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="g_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="h_1" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="i_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="j_1" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="k_1" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="l_1" size="5" VALUE="0" style="height:20px; width:25px;">)</br>Show<input type="checkbox" id="curveshow_1"checked>mouseDraw<input type="checkbox"  id="mouseDC_1" name="onlyOne" onClick="javascript:test2(0)">allPoints<input type="checkbox"  id="cm_1"      name="onlyPC"  onClick="javascript:test3(0)">point1<input   type="checkbox"  id="CP1_1"     name="onlyPC"  onClick="javascript:test3(1)" value="1">point2<input   type="checkbox"  id="CP2_1"     name="onlyPC"  onClick="javascript:test3(2)" value="2">point3<input   type="checkbox"  id="CP3_1"     name="onlyPC"  onClick="javascript:test3(3)" value="3">point4<input   type="checkbox"  id="CP4_1"     name="onlyPC"  onClick="javascript:test3(4)" value="4"></br>Dash<input type="checkbox" id="curvedash_1">Guide<input type="checkbox" id="curveguide_1" >Name<input type="text" id="curvename_1" size="5" VALUE="">Color:
+				<select id = "curveColor_1">
+				<option value = "black" selected>black</option>
+				<option value = "yellow">yellow</option>
+				<option value = "red">red</option>
+				<option value = "blue">blue</option>
+				<option value = "purple">purple</option>
+				<option value = "brown">brown</option>
+				<option value = "orange">orange</option>
+				<option value = "green">green</option>
+				</select>
+				<input type="button" id="1" onclick="delC(id)" value="clear"></input>
+				</br></br>
+				Curve 2: (<input type="text" id="e_2" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="f_2" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="g_2" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="h_2" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="i_2" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="j_2" size="5" VALUE="0" style="height:20px; width:25px;">)--(<input type="text" id="k_2" size="5" VALUE="0" style="height:20px; width:25px;">,<input type="text" id="l_2" size="5" VALUE="0" style="height:20px; width:25px;">)</br>Show<input type="checkbox" id="curveshow_2">mouseDraw<input type="checkbox"  id="mouseDC_2" name="onlyOne" onClick="javascript:test2(1)">allPoints<input type="checkbox"  id="cm_2"      name="onlyPC"  onclick="javascript:test3(5)">point1<input   type="checkbox"  id="CP1_2"     name="onlyPC"  onclick="javascript:test3(6)"  value="1">point2<input   type="checkbox"  id="CP2_2"     name="onlyPC"  onclick="javascript:test3(7)"  value="2">point3<input   type="checkbox"  id="CP3_2"     name="onlyPC"  onclick="javascript:test3(8)"  value="3">point4<input   type="checkbox"  id="CP4_2"     name="onlyPC"  onclick="javascript:test3(9)"  value="4"></br>Dash<input type="checkbox" id="curvedash_2">Guide<input type="checkbox" id="curveguide_2" >Name<input type="text" id="curvename_2" size="5" VALUE="">Color:
+				<select id = "curveColor_2">
+				<option value = "black" selected>black</option>
+				<option value = "yellow">yellow</option>
+				<option value = "red">red</option>
+				<option value = "blue">blue</option>
+				<option value = "purple">purple</option>
+				<option value = "brown">brown</option>
+				<option value = "orange">orange</option>
+				<option value = "green">green</option>
+				</select>
+				<input type="button" id="2" onclick="delC(id)" value="clear"></input>
+				</br></br>
+				</FORM>
+				</li>
+			</ul>
+			</li><!-3->
+			
+			<li><a href="#">"<i class="icon-paste8"></i>"&nbsp;Graph Examples</a><!-4->
+			<ul>
+				<li>
+				Examples:
+				<input TYPE="button" class="btn M" Value="Demand and Supply" onClick="Example1()">
+				<input TYPE="button" class="btn M" Value="Growth" onClick="Example2()">
+				<input TYPE="button" class="btn M" Value="Cost Curve" onClick="Example3()">
+				<input TYPE="button" class="btn M" Value="Utility Max" onClick="Example4()"><br>
+				</li>
+			</ul>
+			</li><!-4->
+
+			<li><a href="#">"<i class="icon-paste9"></i>"&nbsp;Export and Import</a><!-5->
+			<ul>
+				<li>
+				<div id="dvData">
+				<table> 
+				<tr><td id="axisLableC"></td></tr>
+				<tr><td id="axisCopy"></td></tr>
+				
+				<tr><td id="lineLableC"></td></tr>
+				<tr><td id="lineCopy"></td></tr>
+		 
+				<tr><td id="curveLableC"></td></tr>
+				<tr><td id="curveCopy"></td></tr>
+
+				<tr><td id="rectangleLableC"></td></tr>
+				<tr><td id="rectangleCopy"></td></tr> 
+				
+				</table>
+				
+				<script type='text/javascript'>
+				$(document).ready(function () {
+				console.log("HELLO")
+				function exportTableToCSV($table, filename) {
+                var $headers = $table.find('tr:has(th)')
+                    ,$rows = $table.find('tr:has(td)')
+
+                    // Temporary delimiter characters unlikely to be typed by keyboard
+                    // This is to avoid accidentally splitting the actual contents
+                    ,tmpColDelim = String.fromCharCode(11) // vertical tab character
+                    ,tmpRowDelim = String.fromCharCode(0) // null character
+
+                    // actual delimiter characters for CSV format
+                    ,colDelim = '","'
+                    ,rowDelim = '"\r\n"';
+
+                    // Grab text from table into CSV formatted string
+                    var csv = '"';
+                    csv += formatRows($headers.map(grabRow));
+                    csv += rowDelim;
+                    csv += formatRows($rows.map(grabRow)) + '"';
+
+                    // Data URI
+                    var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+
+					$(this)
+                    .attr({
+                    'download': filename
+                        ,'href': csvData
+                        //,'target' : '_blank' //if you want it to open in a new window
+					});
+
+					//------------------------------------------------------------
+					// Helper Functions 
+					//------------------------------------------------------------
+					// Format the output so it has the appropriate delimiters
+					function formatRows(rows){
+                    return rows.get().join(tmpRowDelim)
+                        .split(tmpRowDelim).join(rowDelim)
+                        .split(tmpColDelim).join(colDelim);
+					}
+					// Grab and format a row from the table
+					function grabRow(i,row){
+                     
+                    var $row = $(row);
+                    //for some reason $cols = $row.find('td') || $row.find('th') won't work...
+                    var $cols = $row.find('td'); 
+                    if(!$cols.length) $cols = $row.find('th');  
+
+                    return $cols.map(grabCol)
+                                .get().join(tmpColDelim);
+					}
+					// Grab and format a column from the table 
+					function grabCol(j,col){
+                    var $col = $(col),
+                        $text = $col.text();
+
+                    return $text.replace('"', '""'); // escape double quotes
+
+					}
+					}
+					// This must be a hyperlink
+					$("#export").click(function (event) {
+					// var outputFile = 'export'
+					var outputFile = window.prompt("What do you want to name your output file (Note: This won't have any effect on Safari)") || 'export';
+					outputFile = outputFile.replace('.csv','') + '.csv'
+                 
+					// CSV
+					exportTableToCSV.apply(this, [$('#dvData>table'), outputFile]);
+                
+					// IF CSV, don't do event.preventDefault() or return false
+					// We actually need this to be a typical hyperlink
+					});
+					});
+					</script>
+				</div>
+				</br>
+				
+
+				<p>
+				<input TYPE="button" Value="Export to Html" onClick="javascript:pt();">
+				<br/>
+				<a href="#" id ="export" role='button'><input id="export" TYPE="button"  Value="CSV File"/></a>
+				</p>
+				</br>
+
+				<input type="file" value="import" id="file" onchange="handleFiles(this.files)"/>
+				
+				</li>
+			</ul>
+			</li><!-5->
+			
+			
+			
+			
+		</ul><!--outside ul-->
+
+
+
+</div><!--content-left-->
+
+<!--content-right1-->
+<div class="content-right1" style="margin: 0 auto; padding: 0px;position:relative;">
+<canvas id="myCanvas" width="600" height="580" style="position:absolute;top:0px;z-index: 1"></canvas><br>
+<canvas id="bgcanvas" width="600" height="580" style="position:absolute;top:0px;z-index:0;"></canvas>
+</div><!--content-right1-->
+
+	</div><!--content-->
+</div><!--1-->
+
+<!--Latex-->
+<div id="result-box" style="margin:0 auto; width:85%" >
+</br>
+    <div class="note" style="float:left"><strong></strong></div>
+    <div class="btn with-zero-clipboard" 
+        id="copy-to-clipboard"
+        data-action-id="copy-to-clipboard" style="float:right"><i class="icon-paste1"></i><Strong>Latex Code</Strong></div>
+        </br>
+        </br>
+<pre class="line-numbers language-Tex" title="Double click to select all" style="height:265px;overflow:scroll;"><code class="language-Tex"><span class="token builtin"><span class="token selector">\documentclass</span><span class="token punctuation">{</span><span class="token constant">minimal</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\usepackage</span><span class="token punctuation">{</span><span class="token constant">tikz</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\begin</span><span class="token punctuation">{</span><span class="token constant">document</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\begin</span><span class="token punctuation">{</span><span class="token constant">tikzpicture</span><span class="token punctuation">}</span></span>
+
+<span id="answer"></span>
+<span class="token builtin"><span class="token selector">\end</span><span class="token punctuation">{</span><span class="token constant">tikzpicture</span><span class="token punctuation">}</span></span>
+<span class="token builtin"><span class="token selector">\end</span><span class="token punctuation">{</span><span class="token constant">document</span><span class="token punctuation">}</span></span>
+<span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+ </code>
+</pre>
+</div>
+
+<!--Footer-->
+<div class="footer-top" id="resume"></div>
+<div class="footer-bottom">
+	<div class="wrap2"></div>
+</div>
+
+</body>
+</html>
